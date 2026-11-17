@@ -75,7 +75,7 @@ public final class VoipPlugin implements KioskPlugin {
             return;
         }
         IntercomClient.Peer self = new IntercomClient.Peer(peerId(extension), "Kiosk Phone", "127.0.0.1", callbacks.port(), VERSION);
-        IntercomClient intercom = new IntercomClient("127.0.0.1", number(s, "intercomPort"), text(s, "intercomKey"), self, h::log);
+        IntercomClient intercom = new IntercomClient("127.0.0.1", number(s, "intercomPort"), text(s, "intercomKey"), self, h::log, bool(s, "adminHttps"));
         intercom.setCallbackServer(callbacks);
         PageBridge bridge = new PageBridge(intercom, new PageBridge.Events() {
             @Override public void onRegistration(boolean registered, String detail) {
@@ -141,6 +141,11 @@ public final class VoipPlugin implements KioskPlugin {
     private static String text(Map<String, Object> s, String key) {
         Object value = s.get(key);
         return value instanceof String ? ((String) value).trim() : "";
+    }
+
+    private static boolean bool(Map<String, Object> s, String key) {
+        Object value = s.get(key);
+        return Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(String.valueOf(value));
     }
 
     private static int number(Map<String, Object> s, String key) {
