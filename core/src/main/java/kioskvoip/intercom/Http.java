@@ -11,6 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Minimal plaintext HTTP/1.1 client: one request per connection, small bodies. java.net.http is not on Android and
@@ -34,8 +37,22 @@ final class Http {
     /** {@code body} null means no body. {@code bearer} goes into Authorization and is never logged. */
     static Response request(String host, int port, String method, String path, String bearer, String body, int timeoutMs)
             throws IOException {
-        try (Socket socket = new Socket()) {
+        return request(host, port, method, path, bearer, body, timeoutMs, false);
+    }
+
+    /** Same request over HTTPS, with normal platform certificate and hostname verification. */
+    static Response request(String host, int port, String method, String path, String bearer, String body,
+                            int timeoutMs, boolean tls) throws IOException {
+        Socket connected = tls ? SSLSocketFactory.getDefault().createSocket() : new Socket();
+        try (Socket socket = connected) {
             socket.connect(new InetSocketAddress(host, port), timeoutMs);
+            if (tls) {
+                SSLSocket ssl = (SSLSocket) socket;
+                SSLParameters parameters = ssl.getSSLParameters();
+                parameters.setEndpointIdentificationAlgorithm("HTTPS");
+                ssl.setSSLParameters(parameters);
+                ssl.startHandshake();
+            }
             socket.setSoTimeout(timeoutMs);
             socket.setTcpNoDelay(true);
             byte[] payload = body == null ? new byte[0] : body.getBytes(StandardCharsets.UTF_8);
