@@ -71,6 +71,14 @@
       "description": "This kiosk's intercom key, as set in Kiosk Satellite."
     },
     {
+      "key": "adminHttps",
+      "type": "boolean",
+      "title": "Remote Admin uses HTTPS",
+      "default": false,
+      "group": "Kiosk intercom",
+      "description": "Enable when Kiosk Satellite's local admin/identity endpoint is served over HTTPS."
+    },
+    {
       "key": "intercomPort",
       "type": "string",
       "title": "KS admin port",

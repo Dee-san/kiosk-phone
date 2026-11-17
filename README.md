@@ -57,6 +57,7 @@ Set these on each kiosk, in the plugin's row. Every kiosk needs its own extensio
 | SIP account | **Local SIP port** | UDP port the kiosk listens on | `5070` |
 | Kiosk intercom | **Intercom key** | This kiosk's Kiosk Satellite intercom key | |
 | Kiosk intercom | **KS admin port** | Kiosk Satellite's admin port | `2324` |
+| Kiosk intercom | **Remote Admin uses HTTPS** | Enable if Kiosk Satellite's local admin/identity endpoint uses HTTPS | off |
 | Kiosk intercom | **Microphone gain** | Boosts the mic for calls, 1 (off) to 30. Some kiosk mics are very quiet. | `8` |
 
 ## 🔒 Privacy and security
