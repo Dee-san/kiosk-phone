@@ -91,6 +91,7 @@ public final class IntercomClient {
 
     private final String host;
     private final int adminPort;
+    private final boolean adminHttps;
     private final String key;
     private final Peer self;
     private final Consumer<String> log;
@@ -101,12 +102,18 @@ public final class IntercomClient {
 
     /** {@code adminPort}: where identity is served (2324 by default in KS). */
     public IntercomClient(String host, int adminPort, String key, Peer self, Consumer<String> log) {
+        this(host, adminPort, key, self, log, false);
+    }
+
+    /** {@code adminHttps} selects HTTPS for the identity/admin endpoint only. */
+    public IntercomClient(String host, int adminPort, String key, Peer self, Consumer<String> log, boolean adminHttps) {
         if (key == null || key.isEmpty()) throw new IllegalArgumentException("Intercom key is empty");
         this.host = host;
         this.adminPort = adminPort;
         this.key = key;
         this.self = self;
         this.log = log;
+        this.adminHttps = adminHttps;
     }
 
     public void setTimeoutMs(int timeoutMs) { this.timeoutMs = timeoutMs; }
@@ -119,7 +126,7 @@ public final class IntercomClient {
         synchronized (this) {
             if (cachedIdentity != null && System.currentTimeMillis() - identityAt < 1100) return cachedIdentity;
         }
-        Http.Response r = Http.request(host, adminPort, "GET", "/api/intercom/identity", null, null, timeoutMs);
+        Http.Response r = Http.request(host, adminPort, "GET", "/api/intercom/identity", null, null, timeoutMs, adminHttps);
         if (r.status != 200) throw new IOException("identity returned HTTP " + r.status);
         Identity identity;
         try {
